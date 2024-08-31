@@ -3,12 +3,12 @@ public import redub.buildapi;
 public import std.system;
 
 BuildRequirements parse(
-    string filePath, 
-    string workingDir,  
-    string compiler, 
+    string filePath,
+    string workingDir,
+    string compiler,
     string arch,
-    string version_, 
-    BuildRequirements.Configuration subConfiguration, 
+    string version_,
+    BuildRequirements.Configuration subConfiguration,
     string subPackage,
     OS targetOS,
     ISA isa,

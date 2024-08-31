@@ -26,14 +26,14 @@ bool dubHook_PackageManagerDownloadPackage(string packageName, string packageVer
     // return false;
 }
 
-/** 
+/**
  * Gets the best matching version on the specified folder
  * Params:
  *   folder = The folder containing the packageName versionentries
  *   packageName = Used to build the path
  *   subPackage = Currently used only for warning
  *   packageVersion = The version required (SemVer)
- * Returns: 
+ * Returns:
  */
 private ReducedPackageInfo getPackageInFolder(string folder, string packageName, string subPackage, string packageVersion)
 {
@@ -74,8 +74,8 @@ private ReducedPackageInfo getPackageInFolder(string folder, string packageName,
     return ReducedPackageInfo.init;
 }
 
-/** 
- * Lookups inside 
+/**
+ * Lookups inside
  * - $HOME/.dub/packages/local-packages.json
  * - $HOME/.dub/packages/**
  *
@@ -102,7 +102,7 @@ PackageInfo getPackage(string packageName, string packageVersion, string require
         pack.path = localPackage.bestVersionPath;
         return pack;
     }
-    
+
     ///If no version was downloaded yet, download before looking
     string downloadedPackagePath = buildNormalizedPath(getDefaultLookupPathForPackages(), packageName);
     if (!std.file.exists(downloadedPackagePath))
@@ -161,7 +161,7 @@ private ReducedPackageInfo getPackageInJSON(JSONValue json, string packageName, 
     return ReducedPackageInfo.init;
 }
 
-/** 
+/**
  * Use this version instead of getPackageInJSON since this one will cache the local packages instead.
  * Params:
  *   packageName = The package name to get
@@ -195,18 +195,18 @@ private string getDefaultLookupPathForPackages()
     return buildNormalizedPath(getDubWorkspacePath, "packages");
 }
 
-/** 
+/**
  * Git style (~master)
  * Params:
  *   str = ~branchName
- * Returns: 
+ * Returns:
  */
 private bool isGitBranchStyle(string str)
 {
     import std.ascii : isAlphaNum;
     import std.algorithm.searching : canFind;
 
-    // Must start with ~ and Can't find a non alpha numeric version 
+    // Must start with ~ and Can't find a non alpha numeric version
     return str.length > 1 && str[0] == '~' &&
         !str[1 .. $].canFind!((ch) => !ch.isAlphaNum);
 }
@@ -216,7 +216,7 @@ private bool isGitHashStyle(string str)
     import std.ascii : isHexDigit;
     import std.algorithm.searching : canFind;
 
-    // Can't find a non hex digit version 
+    // Can't find a non hex digit version
     return str.length > 0 && !str.canFind!((ch) => !ch.isHexDigit);
 }
 

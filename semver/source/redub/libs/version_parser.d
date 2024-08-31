@@ -9,8 +9,8 @@ nint[3] parseVersion(string verString, out ptrdiff_t currIndex)
     import std.algorithm.iteration;
     import std.conv:to;
     nint[3] ret;
-    
-    
+
+
     ubyte retIndex = 0;
     ptrdiff_t i = -1;
 
@@ -27,10 +27,10 @@ nint[3] parseVersion(string verString, out ptrdiff_t currIndex)
             currIndex+= i;
             break;
         }
-        else 
+        else
         {
             currIndex+= value.length;
-            if(currIndex < verString.length) 
+            if(currIndex < verString.length)
                 currIndex+= 1; //Advance the dot
         }
     }

@@ -77,10 +77,10 @@ void addDebugVersions(ref BuildRequirements req, JSONStringArray vers, ParseConf
 void addLinkFlags(ref BuildRequirements req, JSONStringArray lFlags, ParseConfig c){req.cfg.linkFlags.exclusiveMerge(lFlags);}
 void addDflags(ref BuildRequirements req, JSONStringArray dFlags, ParseConfig c){req.cfg.dFlags.exclusiveMerge(dFlags);}
 void addDependency(
-    ref BuildRequirements req, 
+    ref BuildRequirements req,
     ParseConfig c,
-    string name, string version_, 
-    BuildRequirements.Configuration subConfiguration, 
+    string name, string version_,
+    BuildRequirements.Configuration subConfiguration,
     string path,
     string visibility,
     PackageInfo* info,
@@ -89,7 +89,7 @@ void addDependency(
 {
     import std.path;
     import std.algorithm.searching:countUntil;
-    if(path.length && !isAbsolute(path)) 
+    if(path.length && !isAbsolute(path))
         path = buildNormalizedPath(c.workingDir, path);
     Dependency dep = dependency(name, path, version_, req.name, c.workingDir, subConfiguration, visibility, info, isOptional);
     //If dependency already exists, use the existing one
@@ -125,19 +125,19 @@ private Dependency dependency(
     ///If subPackage was found, populate informations on it
     if(out_mainPackageName.length)
         name = out_mainPackageName;
-    
+
     ///Inside this same package (requirementName:subPackage or :subPackage)
     if(subPackage && (out_mainPackageName == requirementName || out_mainPackageName.length == 0))
         path = workingDir;
 
     Visibility visibility = Visibility.public_;
     if(visibilityStr) visibility = VisibilityFrom(visibilityStr);
-    
+
     return Dependency(name, path, version_, subConfiguration, subPackage, visibility, info, isOptional);
 }
 
 void addSubConfiguration(
-    ref BuildRequirements req, 
+    ref BuildRequirements req,
     ParseConfig c,
     string dependencyName,
     string subConfigurationName

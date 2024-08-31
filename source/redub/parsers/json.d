@@ -9,7 +9,7 @@ import redub.parsers.base;
 import redub.command_generators.commons;
 import core.runtime;
 
-/** 
+/**
  * Those commands are independent of the selected target OS.
  * It will use the host OS instead of targetOS since they depend on the machine running them
  */
@@ -20,11 +20,11 @@ immutable string[] commandsWithHostFilters = [
     "postGenerateCommands"
 ];
 
-BuildRequirements parse(string filePath, 
-    string projectWorkingDir, 
-    string compiler, 
+BuildRequirements parse(string filePath,
+    string projectWorkingDir,
+    string compiler,
     string arch,
-    string version_, 
+    string version_,
     BuildRequirements.Configuration subConfiguration,
     string subPackage,
     OS targetOS,
@@ -51,10 +51,10 @@ private JSONValue parseJSONCached(string filePath)
 
 
 
-/** 
+/**
  * Params:
  *   json = A dub.json equivalent
- * Returns: 
+ * Returns:
  */
 BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
 {
@@ -116,7 +116,7 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
                     JSONValue* platforms = "platforms" in projectConfiguration;
                     if(platforms)
                     {
-                        enforce(platforms.type == JSONType.array, 
+                        enforce(platforms.type == JSONType.array,
                             "'platforms' on configuration "~name.str~" at project "~req.name
                         );
                         if(!platformMatches(platforms.array, os, c.isa))
@@ -150,7 +150,7 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
             import std.algorithm.comparison;
             import redub.package_searching.api;
             import redub.package_searching.cache;
-            
+
             foreach(string depName, JSONValue value; v.object)
             {
                 string version_, path, visibility;
@@ -170,8 +170,8 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
                     const(JSONValue)* depVer = "version" in value;
                     const(JSONValue)* depRep = "repository" in value;
                     visibility = value.tryStr("visibility");
-                    enforce(depPath || depVer, 
-                        "Dependency named "~ depName ~ 
+                    enforce(depPath || depVer,
+                        "Dependency named "~ depName ~
                         " must contain at least a \"path\" or \"version\" property."
                     );
                     if("optional" in value && value["optional"].boolean == true)
@@ -209,7 +209,7 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
         "subConfigurations": (ref BuildRequirements req, JSONValue v, ParseConfig c)
         {
             enforce(v.type == JSONType.object, "subConfigurations must be an object conversible to string[string]");
-            
+
             foreach(string key, JSONValue value; v)
                 addSubConfiguration(req, c, key, value.str);
         },
@@ -217,11 +217,11 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
     ];
     if(cfg.subPackage)
     {
-        enforce("name" in json, 
+        enforce("name" in json,
             "dub.json at "~cfg.workingDir~
             " which contains subPackages, must contain a name"
         );
-        enforce("subPackages" in json, 
+        enforce("subPackages" in json,
             "dub.json at "~cfg.workingDir~
             " must contain a subPackages property since it has a subPackage named "~cfg.subPackage
         );
@@ -247,7 +247,7 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
                 string subPackagePath = p.str;
                 if(!std.path.isAbsolute(subPackagePath))
                     subPackagePath = buildNormalizedPath(cfg.workingDir, subPackagePath);
-                enforce(std.file.isDir(subPackagePath), 
+                enforce(std.file.isDir(subPackagePath),
                     "subPackage path '"~subPackagePath~"' must be a directory "
                 );
                 string subPackageName = pathSplitter(subPackagePath).back;
@@ -257,9 +257,9 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, bool isRoot = false)
                     isSubpackageInPackage = true;
                     return parseProject(subPackagePath, cfg.compiler, cfg.arch, cfg.subConfiguration, null, null, cfg.targetOS, cfg.isa, false, cfg.version_);
                 }
-            } 
+            }
         }
-        enforce(isSubpackageInPackage, 
+        enforce(isSubpackageInPackage,
             "subPackage named '"~cfg.subPackage~"' could not be found " ~
             "while looking inside the requested package '"~buildRequirements.name ~ "' "~
             "in path "~cfg.workingDir
@@ -289,7 +289,7 @@ private void runHandlers(
         {
             CommandWithFilter filtered = CommandWithFilter.fromKey(key);
             fn = filtered.command in handler;
-            
+
             OS osToMatch = cfg.targetOS;
             ///If the command is inside the host filters, it will use host OS instead.
             if(commandsWithHostFilters.countUntil(filtered.command) != -1) osToMatch = std.system.os;
@@ -361,13 +361,13 @@ private bool matchesOS(string osRep, OS os)
 {
     switch(osRep) with(OS)
     {
-        case "posix": return os == solaris || 
-                             os == dragonFlyBSD || 
-                             os == freeBSD || 
+        case "posix": return os == solaris ||
+                             os == dragonFlyBSD ||
+                             os == freeBSD ||
                              os ==  netBSD ||
-                             os == openBSD || 
-                             os == otherPosix || 
-                             "linux".matchesOS(os) || 
+                             os == openBSD ||
+                             os == otherPosix ||
+                             "linux".matchesOS(os) ||
                              "osx".matchesOS(os);
         case "freebsd": return os == freeBSD;
         case "netbsd": return os == netBSD;
@@ -402,7 +402,7 @@ struct PlatformFilter
     bool matchesPlatform(OS os, ISA isa, string compiler = null){return matchesOS(os) && matchesArch(isa) && matchesCompiler(compiler);}
 
 
-    /** 
+    /**
      * Splits command-compiler-os-arch into a struct.
      * Input examples:
      * - dflags-osx
@@ -410,7 +410,7 @@ struct PlatformFilter
      * - dependencies-windows
      * Params:
      *   key = Any key matching input style
-     * Returns: 
+     * Returns:
      */
     static PlatformFilter fromKeys(string[] keys)
     {
@@ -447,7 +447,7 @@ struct CommandWithFilter
     bool matchesPlatform(OS os, ISA isa, string compiler = null){return filter.matchesPlatform(os, isa, compiler);}
 
 
-    /** 
+    /**
      * Splits command-compiler-os-arch into a struct.
      * Input examples:
      * - dflags-osx
@@ -455,14 +455,14 @@ struct CommandWithFilter
      * - dependencies-windows
      * Params:
      *   key = Any key matching input style
-     * Returns: 
+     * Returns:
      */
     static CommandWithFilter fromKey(string key)
     {
         import std.string;
         CommandWithFilter ret;
 
-        string[] keys = key.split("-"); 
+        string[] keys = key.split("-");
         if(keys.length == 1)
             return ret;
         ret.command = keys[0];

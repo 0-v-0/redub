@@ -86,10 +86,10 @@ struct CompilationCache
         return CompilationCache(reqCache, rootHash, AdvCacheFormula.deserialize(targetCache.array[0]), AdvCacheFormula.deserialize(targetCache.array[1]));
     }
 
-    /** 
-     * 
+    /**
+     *
      * Params:
-     *   req = Requirement to generate hash 
+     *   req = Requirement to generate hash
      *   compiler = Compiler to generate hash
      *   target = Target to generate hash
      *   cache = Optional argument which stores precalculated results
@@ -121,9 +121,9 @@ struct CompilationCache
     }
 }
 
-/** 
+/**
  * Params:
- *   root = 
+ *   root =
  * Returns: Current cache status from root, without modifying it
  */
 CompilationCache[] cacheStatusForProject(ProjectNode root, Compiler compiler)
@@ -136,7 +136,7 @@ CompilationCache[] cacheStatusForProject(ProjectNode root, Compiler compiler)
     return cache;
 }
 
-/** 
+/**
  * This function mutates the ProjectNode|s, isUpToDate property. It checks on the entire tree
  * if it is not up to date, when it is not, it invalidates itself and all their parents.
  * It requires the existing cache status for the project and then, starts comparing, with its current
@@ -237,7 +237,7 @@ string hashFrom(const BuildRequirements req, Compiler compiler, bool isRoot = tr
     return hashFrom(req.cfg, compiler, isRoot);
 }
 
-/** 
+/**
  * This function will generate a formula based on its inputs. Every dependency will check for its output artifact. This is the most reliable way
  * to build across multiple compilers and configurations without having a separate cache.
  * Params:

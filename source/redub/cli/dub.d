@@ -2,14 +2,12 @@ module redub.cli.dub;
 public import std.getopt;
 
 /// The URL to the official package registry and it's default fallback registries.
-static immutable string[] defaultRegistryURLs = [
+immutable defaultRegistryURLs = [
 	"https://code.dlang.org/",
 	"https://codemirror.dlang.org/",
 	"https://dub.bytecraft.nl/",
 	"https://code-mirror.dlang.io/",
 ];
-
-
 
 enum SkipRegistry
 {
@@ -127,7 +125,7 @@ struct DubArguments
 {
     DubCommonArguments cArgs;
     DubBuildArguments build;
-    
+
     @("Specifies the type of build to perform. Note that setting the DFLAGS environment variable will override the build type with custom flags." ~
     "Possible names:")
     @("build|b")
@@ -166,7 +164,7 @@ struct DubArguments
     @("Define the specified `debug` version identifier when building - can be used multiple times")
     @("d|debug")
     string[] debugVersions;
-    
+
     @(
         "Define the specified `version` identifier when building - can be used multiple times."~
         "Use sparingly, with great power comes great responsibility! For commonly used or combined versions "~
@@ -178,7 +176,7 @@ struct DubArguments
     bool nodeps;
 
     @("Specifies the way the compiler and linker are invoked. Valid values:" ~
-    "  separate (default), allAtOnce, singleFile") 
+    "  separate (default), allAtOnce, singleFile")
     @("build-mode")
     string buildMode;
 
@@ -220,12 +218,12 @@ struct DubBuildArguments
     @("n|non-interactive")
     bool nonInteractive;
 
-    @("Build incrementally. This usually works on a case basis, so for you case, disabling it might make it faster."~ 
+    @("Build incrementally. This usually works on a case basis, so for you case, disabling it might make it faster."~
     "It is inferred to be incremental when dependencies count >= 3. Supports |auto|on|off|")
     @("incremental")
     IncrementalInfer incremental;
 
-    @("Build parallelization type. Supported options are |auto|full|leaves|no|. Default being auto. Full will attempt "~ 
+    @("Build parallelization type. Supported options are |auto|full|leaves|no|. Default being auto. Full will attempt "~
     " to build every dependency at the same time. Leaves will build in parallel the dependencies that has no dependency. No will "~
     " build in single thread."
     )
@@ -264,7 +262,7 @@ private string genGetoptCall(T)(string memberName)
             else
             {
                 alias att = __traits(getAttributes, member);
-                static if(att.length == 2) 
+                static if(att.length == 2)
                     ret~= att[1].stringof ~ ", "~att[0].stringof;
                 else
                     ret~= mem.stringof~", "~att[0].stringof;

@@ -36,9 +36,9 @@ string formatError(string err)
 }
 /**
 * Redub work with input -> output on each step. It must be almost stateless.
-* ** CLI will be optionally implemented later. 
+* ** CLI will be optionally implemented later.
 * ** Cache will be optionally implemented later
-* 
+*
 * FindProject -> ParseProject -> MergeWithEnvironment -> ConvertToBuildFlags ->
 * Build
 */
@@ -92,11 +92,11 @@ int executeProgram(ProjectNode tree, string[] args)
 
 
     import redub.command_generators.commons;
-    
+
     return wait(spawnShell(
         escapeShellCommand(
-            buildNormalizedPath(tree.requirements.cfg.outputDirectory, 
-            tree.requirements.cfg.name~getExecutableExtension(os)) ~  execArgs   
+            buildNormalizedPath(tree.requirements.cfg.outputDirectory,
+            tree.requirements.cfg.name~getExecutableExtension(os)) ~  execArgs
         )
     ));
 }
@@ -104,7 +104,7 @@ int executeProgram(ProjectNode tree, string[] args)
 int describeMain(string[] args)
 {
     DubDescribeArguments desc;
-    try 
+    try
     {
         GetoptResult res = betterGetopt(args, desc);
         if(res.helpWanted)
@@ -117,7 +117,7 @@ int describeMain(string[] args)
     ProjectDetails d = resolveDependencies(args);
     if(!d.tree)
         return 1;
-    
+
     alias OutputData = string[];
 
     static immutable outputs =[
@@ -136,8 +136,8 @@ int describeMain(string[] args)
         "versions": (ref string[] dataContainer, const ProjectNode root){dataContainer~= root.requirements.cfg.versions;},
         // "debug-versions": (){},
         "import-paths": (ref string[] dataContainer, const ProjectNode root){dataContainer~= root.requirements.cfg.importDirectories;},
-        "string-import-paths": (ref string[] dataContainer, const ProjectNode root){dataContainer~= root.requirements.cfg.stringImportPaths;}, 
-        "import-files": (ref string[] dataContainer, const ProjectNode root){}, 
+        "string-import-paths": (ref string[] dataContainer, const ProjectNode root){dataContainer~= root.requirements.cfg.stringImportPaths;},
+        "import-files": (ref string[] dataContainer, const ProjectNode root){},
         "options": (ref string[] dataContainer, const ProjectNode root){}
     ];
     OutputData[] outputContainer = new OutputData[](desc.data.length);
@@ -195,7 +195,7 @@ int cleanMain(string[] args)
     ProjectDetails d = resolveDependencies(args);
     if(!d.tree)
         return d.getReturnCode;
-    
+
     auto res = timed(()
     {
         info("Cleaning project ", d.tree.name);
@@ -203,7 +203,7 @@ int cleanMain(string[] args)
         foreach(ProjectNode node; d.tree.collapse)
         {
             string output = buildNormalizedPath(
-                node.requirements.cfg.outputDirectory, 
+                node.requirements.cfg.outputDirectory,
                 getOutputName(node.requirements.cfg.targetType, node.name, os)
             );
             if(std.file.exists(output))

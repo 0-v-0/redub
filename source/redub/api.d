@@ -35,7 +35,7 @@ struct ProjectDetails
     void getSourceFiles(out string[] output) const {putSourceFiles(tree, output);}
 }
 
-/** 
+/**
  * CompilationDetails are required for making proper compilation.
  */
 struct CompilationDetails
@@ -53,7 +53,7 @@ struct CompilationDetails
     ///Whether the build should be fully parallel, simple, no or inferred
     ParallelType parallelType;
 }
-/** 
+/**
  * Project in which should be parsed.
  */
 struct ProjectToParse
@@ -126,15 +126,15 @@ ProjectDetails buildProject(ProjectDetails d)
         {
             case ParallelType.full:
                 info("Project ", tree.name," is fully parallelizable! Will build everything at the same time");
-                return buildProjectFullyParallelized(tree, d.compiler, targetOS); 
+                return buildProjectFullyParallelized(tree, d.compiler, targetOS);
             case ParallelType.leaves:
                 info("Project ", tree.name," will build with simple parallelization!");
-                return buildProjectParallelSimple(tree, d.compiler, targetOS); 
+                return buildProjectParallelSimple(tree, d.compiler, targetOS);
             case ParallelType.no:
                 info("Project ", tree.name," is single dependency, performing single threaded build");
                 return buildProjectSingleThread(tree, d.compiler, targetOS);
                 break;
-            default: 
+            default:
                 throw new Exception(`Unsupported parallel type in this step.`);
         }
     });
@@ -147,7 +147,7 @@ ProjectDetails buildProject(ProjectDetails d)
 }
 
 
-/** 
+/**
  * Use this function to get a project information.
  * Params:
  *   invalidateCache = Should invalidate cache or should auto check
@@ -195,10 +195,10 @@ ProjectDetails resolveDependencies(
     redub.parsers.environment.setupBuildEnvironmentVariables(dubVars);
 
     BuildRequirements req = parseProject(
-        proj.workingDir, 
+        proj.workingDir,
         compiler.getCompilerString,
         cDetails.arch,
-        BuildRequirements.Configuration(proj.configuration, false), 
+        BuildRequirements.Configuration(proj.configuration, false),
         proj.subPackage,
         proj.recipe,
         osFromArch(cDetails.arch),
@@ -218,18 +218,18 @@ ProjectDetails resolveDependencies(
     redub.parsers.environment.setupEnvironmentVariablesForPackageTree(tree);
 
 
-    import redub.libs.colorize;    
+    import redub.libs.colorize;
     infos("Dependencies resolved ", "in ", (st.peek.total!"msecs"), " ms for \"", color(buildType, fg.magenta),"\" using ", compiler.binOrPath, " [", cInfo.targetOS, "-", cInfo.isa, "]");
     return ProjectDetails(tree, compiler, cDetails.parallelType, cDetails, false, 0, invalidateCache);
 }
 
 
-/** 
- * 
+/**
+ *
  * Params:
  *   incremental = If auto, it will disable incremental when having more than 3 compilation units
- *   tree = The tree to find compilation units 
- * Returns: 
+ *   tree = The tree to find compilation units
+ * Returns:
  */
 bool isIncremental(IncrementalInfer incremental, ProjectNode tree)
 {

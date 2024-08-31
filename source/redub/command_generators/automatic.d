@@ -37,7 +37,7 @@ string getLinkCommands(const ThreadBuildData data, OS os, Compiler compiler, str
 {
     import command_generators.linkers;
     string[] flags;
-    
+
     version(Windows) flags = parseLinkConfigurationMSVC(data, os, compiler, mainPackHash);
     else flags = parseLinkConfiguration(data, os, compiler, mainPackHash);
 
@@ -50,7 +50,7 @@ string getLinkCommands(const ThreadBuildData data, OS os, Compiler compiler, str
 }
 
 
-/** 
+/**
  * Executes escaleShellCommand for fixing issues such as -rpath=$ORIGIN expanding to -rpath="" which may cause some issues
  * this will guarantee that no command is expanded by the shell environment
  * Params:

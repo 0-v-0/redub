@@ -37,7 +37,7 @@ bool hardLinkFile(string from, string to, bool overwrite = false)
     {
         throw new Exception("The output directory '"~toDir~"' from the copy operation with input file '"~from~"' does not exists.");
     }
-	if (exists(to)) 
+	if (exists(to))
     {
 		enforce(overwrite, "Destination file already exists.");
         if(isSameFile(from, to))
@@ -78,7 +78,7 @@ bool hardLinkFile(string from, string to, bool overwrite = false)
 	// fallback to copy
     try
     {
-	    std.file.copy(from, to);        
+	    std.file.copy(from, to);
     }
     catch(Exception e)
     {

@@ -203,7 +203,7 @@ struct JSONValue
 
     JSONValue object() const
     {
-        assert(type == JSONType.object, "Tried to get type object but value is of type "~getTypeName); 
+        assert(type == JSONType.object, "Tried to get type object but value is of type "~getTypeName);
 		JSONValue ret;
 		ret.data = data;
 		ret.error = error;
@@ -365,7 +365,7 @@ struct JSONValue
 				ch = data[i];
 				switch(ch)
 				{
-					case '"': 
+					case '"':
 					{
 						ret = pool.resizeString(ret, returnLength);
 						newIndex = i;
@@ -399,7 +399,7 @@ struct JSONValue
 				}
 				if(returnLength >= ret.length)
 					ret = pool.resizeString(ret, ret.length*2);
-				
+
 				ret[returnLength++] = ch;
 				i++;
 			}
@@ -429,7 +429,7 @@ struct JSONValue
 				}
 				if(isNumber(data[newIndex]))
 					newIndex++;
-				else 
+				else
 					break;
 			}
 			if(hasDecimal)
@@ -490,7 +490,7 @@ struct JSONValue
 		void popScope()
 		{
 			assert(stackLength > 0, "Unexpected pop.");
-			
+
 			stackLength--;
 			if(stackLength > 0)
 			{
@@ -545,7 +545,7 @@ struct JSONValue
 			char ch = data[index];
 			switch(ch)
 			{
-				case '\n': 
+				case '\n':
 					line++;
 					break;
 				case '{':
@@ -723,7 +723,7 @@ struct JSONValue
             if (result)
                 break;
         }
-    
+
         return result;
     }
 	bool hasErrorOccurred(){ return error.length != 0; }
@@ -841,7 +841,7 @@ struct JSONValue
             foreach(v; data.array.value)
                 v.dispose();
         }
-        
+
     }
 }
 

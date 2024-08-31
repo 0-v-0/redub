@@ -5,7 +5,7 @@ import std.typecons;
 import std.conv:to;
 
 
-struct SemVer 
+struct SemVer
 {
     private struct RawVersion
     {
@@ -19,7 +19,7 @@ struct SemVer
         this(nint M){major = M;}
         this(nint M, nint m){major = M; minor = m;}
         this(nint M, nint m, nint p){major = M; minor = m; patch = p;}
-       
+
 
         ComparisonResult[3] compare(const RawVersion other) const @nogc nothrow
         {
@@ -54,13 +54,13 @@ struct SemVer
             import std.conv;
             if(major.isNull) return null;
             if(minor.isNull) return major.get.to!string;
-            
+
             auto majChars = major.get.toChars;
             auto minChars = minor.get.toChars;
             char[] ret;
             size_t length = majChars.length+minChars.length+1;
             typeof(toChars(patch.get)) patChars;
-            
+
             if(!patch.isNull)
             {
                 patChars = patch.get.toChars;
@@ -84,7 +84,7 @@ struct SemVer
     RawVersion ver;
     ComparisonResult[3] comparison = ComparisonTypes.mustBeEqual;
     private string versionStringRepresentation;
-    private 
+    private
     {
         string buildPart;
         string metadata;
@@ -104,7 +104,7 @@ struct SemVer
     private bool isUsingRange;
     private string rangeMax;
 
-    this(string v) 
+    this(string v)
     {
         import std.string;
         import std.ascii:isDigit;
@@ -113,7 +113,7 @@ struct SemVer
         versionStringRepresentation = v;
         v = strip(v);
 
-        
+
         ///Take modifiers out (operators), e.g: ['*', '>=', '<=', '>', '<', '=', '~']
         ptrdiff_t modifierSeparator = v.indexOfFirstMatching(c => isDigit(c));
         string op;
@@ -149,7 +149,7 @@ struct SemVer
             buildPart = v[1..lastIndex];
             v = v[lastIndex..$];
         }
-        
+
         ///Take metadata out, e.g: 1.9.2+some_data
         if(v.length > 0 && v[0] == '+')
         {
@@ -161,7 +161,7 @@ struct SemVer
         }
 
 
-        
+
         ///Take ranges out, e.g: '>=1.9.2 < 2.0.0'
         ptrdiff_t rangesSeparator = v.indexOfFirstMatching(c => !isDigit(c) && c != '.' && c != '*' && c != 'x');
         if(rangesSeparator != -1)
@@ -172,8 +172,8 @@ struct SemVer
         }
     }
 
-    /** 
-     * 
+    /**
+     *
      * Params:
      *   ver = Just a string representation
      * Returns: A SemVer that can match anything.
@@ -191,7 +191,7 @@ struct SemVer
             return ver.isZero();
         return comparison == ComparisonTypes.any;
     }
-    
+
     bool isInvalid(){return invalid;}
     private void setInvalid(string errMessage)
     {
@@ -207,7 +207,7 @@ struct SemVer
         return ver.opCmp(other.ver);
     }
 
-    bool satisfies(const SemVer requirement) const 
+    bool satisfies(const SemVer requirement) const
     {
         if(comparison == ComparisonTypes.any) return true;
         if(invalid) return false;
@@ -241,7 +241,7 @@ struct SemVer
 
 
 private alias cr = ComparisonResult;
-enum ComparisonTypes : ComparisonResult[3] 
+enum ComparisonTypes : ComparisonResult[3]
 {
     /// Implementation when directly specified version, or `=` is used.
     mustBeEqual = [cr.equal, cr.equal, cr.equal],
@@ -264,7 +264,7 @@ private ptrdiff_t indexOfFirstMatching(string str, scope indexOfFirstMatchingDg 
     return -1;
 }
 
-/** 
+/**
  * Operator `-` not included since it can't be described as a a ComparisonType
  * Params:
  *   sv = Semver which will be populated
@@ -275,14 +275,14 @@ private bool parseOperator(ref SemVer sv, string op, size_t partsLength) @nogc n
     switch(op) with(ComparisonResult)
     {
         case "*":  sv.comparison = [any, any, any]; break;
-        case "=", "==":  
+        case "=", "==":
             sv.comparison = [equal, equal, equal]; break;
         case "^":  sv.comparison = [equal, atOnce, gtEqual];  break;
-        case "~", "~>":  
+        case "~", "~>":
             if(partsLength <= 2)
                 sv.comparison = [equal, atOnce, gtEqual];
             else
-                sv.comparison = [equal, equal, gtEqual]; 
+                sv.comparison = [equal, equal, gtEqual];
             break;
         case ">":  sv.comparison = [atOnce, greaterThan, greaterThan]; break;
         case ">=": sv.comparison = [atOnce, gtEqual, gtEqual]; break;
@@ -335,7 +335,7 @@ private ComparisonResult cmp(int a, int b) @nogc nothrow
 }
 
 
-@("Compare Equal Versions")
+@"Compare Equal Versions"
 unittest
 {
     SemVer a = SemVer("=1.2.3");
@@ -343,8 +343,8 @@ unittest
     assert(!SemVer("1.2.4").satisfies(a));
 }
 
-@("Compare Using ~")
-unittest 
+@"Compare Using ~"
+unittest
 {
     SemVer gtPatches = SemVer("~1.2.3");
 
@@ -359,7 +359,7 @@ unittest
     // assert(SemVer("~5").satisfies("5.0.0"));
 }
 
-@("Compare Using Metadata")
+@"Compare Using Metadata"
 unittest
 {
     string meta = "anything.is.accepted.here!";
@@ -368,14 +368,14 @@ unittest
     assert(a.getMetadata == meta);
 }
 
-@("Compare using build part")
+@"Compare using build part"
 unittest
 {
     SemVer a = SemVer("1.2.3-beta1");
     assert(SemVer("1.2.3").satisfies(a));
 }
 
-@("Compare Using ^")
+@"Compare Using ^"
 unittest
 {
     SemVer a = SemVer("^1.2.3");
@@ -383,7 +383,7 @@ unittest
     assert(SemVer("1.9.9").satisfies(a));
 }
 
-@("Compare using *")
+@"Compare using *"
 unittest
 {
     SemVer a = SemVer("*");

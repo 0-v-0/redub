@@ -30,7 +30,7 @@ string[] parseLinkConfiguration(const ThreadBuildData data, OS target, Compiler 
         }
         if(targetType == TargetType.dynamicLibrary)
             commands~= getTargetTypeFlag(targetType, compiler);
-        
+
         if (targetType.isLinkedSeparately)
         {
             ///Use library full path for the base file
@@ -39,7 +39,7 @@ string[] parseLinkConfiguration(const ThreadBuildData data, OS target, Compiler 
             commands = mapAppendPrefix(commands, libraryPaths, "-L-L", true);
             commands = mapAppendReverse(commands, libraries, (string l) => "-L-l"~stripExtension(l));
             commands~= getLinkFiles(b.sourceFiles);
-            
+
         }
         else if(!compiler.isDCompiler) //Generates a static library using archiver. FIXME: BuildRequirements should know its files.
         {
@@ -78,10 +78,10 @@ string[] parseLinkConfigurationMSVC(const ThreadBuildData data, OS target, Compi
         {
             commands~= "-L/INCREMENTAL:NO";
         }
-        
+
         if(targetType == TargetType.dynamicLibrary)
             commands~= getTargetTypeFlag(targetType, compiler);
-        
+
         commands = mapAppendReverse(commands, data.extra.librariesFullPath, (string l) => (l~getLibraryExtension(target)).escapePath);
 
         commands = mapAppendPrefix(commands, linkFlags, "-L", false);
@@ -89,7 +89,7 @@ string[] parseLinkConfigurationMSVC(const ThreadBuildData data, OS target, Compi
         commands = mapAppendPrefix(commands, libraryPaths, "-L/LIBPATH:", true);
         commands~= getLinkFiles(b.sourceFiles);
         commands = mapAppend(commands, libraries, (string l) => "-L"~stripExtension(l)~".lib");
-        
+
         commands~= buildNormalizedPath(outputDirectory, name~getObjectExtension(target)).escapePath;
 
         commands~= "-of"~buildNormalizedPath(getCacheOutputDir(requirementCache, b, compiler, target), getOutputName(b, target)).escapePath;

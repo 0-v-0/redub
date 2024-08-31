@@ -27,7 +27,7 @@ AcceptedCompiler acceptedCompilerfromString(string str)
 }
 
 
-/** 
+/**
  * Using this structure, it is possible to use any compiler with any version as long
  * they are the valid AcceptedCompiler list.
  */
@@ -37,7 +37,7 @@ struct Compiler
     AcceptedCompiler compiler;
     ///Version of the compiler used.
     SemVer version_;
-    ///D Only - Which frontend was based 
+    ///D Only - Which frontend was based
     SemVer frontendVersion;
 
     ///Contents of executing binOrPath --version
@@ -77,7 +77,7 @@ bool isDCompiler(immutable Compiler comp)
 }
 
 
-/** 
+/**
  * Redub will try to search compilers in that order if the D compiler on getCompiler is not found.
  */
 immutable string[] searchableCompilers = [
@@ -86,12 +86,12 @@ immutable string[] searchableCompilers = [
 ];
 
 
-/** 
+/**
  * Tries to find in the local folder for an executable file with the name of compilerOrPath.
  * They are only searched if the path is not absolute
  * Params:
  *   compilerOrPath = The base compiler name to search on the current directory.
- * Returns: 
+ * Returns:
  */
 private string tryGetCompilerOnCwd(string compilerOrPath)
 {
@@ -113,7 +113,7 @@ private string tryGetCompilerOnCwd(string compilerOrPath)
     return compilerOrPath;
 }
 
-/** 
+/**
  * Tries to find the compiler to use. If the preferred compiler is not on the user environment, it will
  * warn and use it instead.
  * Params:
@@ -158,7 +158,7 @@ private string getActualCompilerToUse(string preferredCompiler, ref string actua
 }
 
 
-/** 
+/**
  * Use this function to get extensive information about the Compiler to use.
  * Params:
  *   compilerOrPath = Can be used both as a global, such as `dmd` or a complete path to a compiler
@@ -175,7 +175,7 @@ Compiler getCompiler(string compilerOrPath, string compilerAssumption)
 
     JSONValue compilersInfo = getRedubMeta();
     bool isDefault;
-    if(compilerOrPath == null) 
+    if(compilerOrPath == null)
     {
         if("defaultCompiler" in compilersInfo)
             compilerOrPath = compilersInfo["defaultCompiler"].str;
@@ -387,7 +387,7 @@ private bool tryInferGcc(string compilerOrPath, string _vString, out Compiler co
     switch(type)
     {
         case "gcc", "tcc":
-            comp = Compiler(AcceptedCompiler.gcc, SemVer.init, SemVer.init, _vString, compilerOrPath); 
+            comp = Compiler(AcceptedCompiler.gcc, SemVer.init, SemVer.init, _vString, compilerOrPath);
             error("GCC Compiler detected. Beware that it is still very untested.");
             return true;
         default: return false;
@@ -441,7 +441,7 @@ private string inBetweenAny(string input, string left, scope const(char)[] anyRi
 
 @"Test DMD Version" unittest
 {
-    string dmdVerString = 
+    string dmdVerString =
 `
 DMD64 D Compiler v2.106.0-dirty                                                                                                                                          Copyright (C) 1999-2023 by The D Language Foundation, All Rights Reserved written by Walter Bright
 `;
@@ -454,7 +454,7 @@ assert(SemVer("2.106.0").satisfies(comp.frontendVersion));
 
 @"Test LDC Version" unittest
 {
-string ldcVerString = 
+string ldcVerString =
 `
 LDC - the LLVM D compiler (1.36.0):                                                                                                                                        based on DMD v2.106.1 and LLVM 17.0.6                                                                                                                                    built with LDC - the LLVM D compiler (1.36.0)                                                                                                                            Default target: x86_64-pc-windows-msvc                                                                                                                                   Host CPU: znver1                                                                                                                                                         http://dlang.org - http://wiki.dlang.org/LDC
 `;

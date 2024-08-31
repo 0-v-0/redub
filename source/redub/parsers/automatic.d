@@ -7,7 +7,7 @@ static import redub.parsers.sdl;
 static import redub.parsers.environment;
 import redub.command_generators.commons;
 
-/** 
+/**
  * Parses an initial directory, not recursively. Currently only .sdl and .json are parsed.
  * After the parse happens, it also partially finish the requirements by using a generalized fix
  * for after the parsing stage.
@@ -23,11 +23,11 @@ import redub.command_generators.commons;
  * Returns: The build requirements to the project. Not recursive.
  */
 BuildRequirements parseProject(
-    string projectWorkingDir, 
-    string compiler, 
+    string projectWorkingDir,
+    string compiler,
     string arch,
-    BuildRequirements.Configuration subConfiguration, 
-    string subPackage, 
+    BuildRequirements.Configuration subConfiguration,
+    string subPackage,
     string recipe,
     OS targetOS,
     ISA isa,
@@ -57,11 +57,11 @@ BuildRequirements parseProject(
     req.cfg.arch = arch;
 
     partiallyFinishBuildRequirements(req);
-    
+
     return req;
 }
 
-/** 
+/**
  * This function finishes some parts of the build requirement:
  * - Merge pending configuration (this guarantees the order is always correct.)
  * - Transforms relative paths into absolute paths
@@ -95,7 +95,7 @@ private void partiallyFinishBuildRequirements(ref BuildRequirements req)
         foreach(ref string dir; *arr)
         {
             import redub.command_generators.commons : escapePath;
-            if(!isAbsolute(dir)) 
+            if(!isAbsolute(dir))
                 dir = buildNormalizedPath(req.cfg.workingDir, dir);
             // dir = escapePath(dir);
         }
@@ -111,7 +111,7 @@ private void partiallyFinishBuildRequirements(ref BuildRequirements req)
     req.cfg.sourceFiles = req.cfg.sourceFiles.filter!((name) => !name.extension.isLibraryExtension).array;
 
 
-    if(!isAbsolute(req.cfg.sourceEntryPoint)) 
+    if(!isAbsolute(req.cfg.sourceEntryPoint))
         req.cfg.sourceEntryPoint = buildNormalizedPath(req.cfg.workingDir, req.cfg.sourceEntryPoint);
 
 

@@ -10,7 +10,7 @@ string[] parseBuildConfiguration(AcceptedCompiler comp, const BuildConfiguration
     import std.path;
     string function(ValidDFlags) mapper = getFlagMapper(comp);
 
-    
+
     string[] commands = [mapper(ValidDFlags.enableColor), mapper(ValidDFlags.preserveNames)];
     with(b)
     {
@@ -65,8 +65,8 @@ string getTargetTypeFlag(TargetType t, AcceptedCompiler c)
 }
 
 
-/** 
- * 
+/**
+ *
  * Params:
  *   dflags = The dFlags which should contain link flags
  * Returns: Only the link flags.
@@ -137,7 +137,7 @@ string dmdFlags(ValidDFlags flag)
         case profileGC: return "-profile=gc";
         case coverage: return "-cov";
         case coverageCTFE: return "-cov=ctfe";
-        
+
         case enableColor: return "-color=on";
         case stringImportPaths: return "-J=";
         case versions: return "-version=";

@@ -1,6 +1,6 @@
 module redub.misc.match_glob;
 
-/** 
+/**
  * Supports * and ? on glob.
  * Params:
  *   input = The input to be tested

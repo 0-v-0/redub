@@ -1,8 +1,8 @@
 module redub.package_searching.entry;
 immutable string[] validEntryFiles = ["dub.json", "dub.sdl"];
 
-/** 
- * 
+/**
+ *
  * Params:
  *   workingDir = A non null working directory. Null is reserved for not found packages. Only absolute paths valid
  * Returns: An accepted project file type.

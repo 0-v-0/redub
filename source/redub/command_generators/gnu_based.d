@@ -10,9 +10,9 @@ string[] parseBuildConfiguration(const BuildConfiguration b, OS os, Compiler com
 {
     import std.algorithm.iteration:map;
     import std.path;
-    
+
     string[] commands;
-    
+
     with(b)
     {
         import std.algorithm: canFind;

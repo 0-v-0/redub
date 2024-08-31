@@ -16,13 +16,13 @@ struct CompilationInfo
 }
 
 
-/** 
+/**
  * This function receives an already parsed project path (BuildRequirements) and finishes parsing
  * its dependees. While it parses them, it also merge the root build flags with their dependees and
  * does that recursively.
- * 
+ *
  * If a project with the same name is found, it is merged with its existing counterpart
- * 
+ *
  * Params:
  *   req = Root project to build
  * Returns: A tree out of the BuildRequirements, with all its compilation flags merged. It is the final step
@@ -38,7 +38,7 @@ ProjectNode getProjectTree(BuildRequirements req, CompilationInfo info)
     detectCycle(tree);
     tree.finish(info.targetOS, info.isa);
     return tree;
-}   
+}
 
 
 void detectCycle(ProjectNode t)
@@ -51,7 +51,7 @@ void detectCycle(ProjectNode t)
         if(node in inStack) throw new Exception("Found a cycle at "~node.name);
         inStack[node] = true;
         visited[node] = true;
-        
+
         foreach(n; node.dependencies)
         {
             if(!(node in visited)) impl(n);
@@ -61,8 +61,8 @@ void detectCycle(ProjectNode t)
     impl(t);
 }
 
-/** 
- * 
+/**
+ *
  * Params:
  *   queue = A queue for breadth first traversal
  *   info = Compiler information for parsing nodes
@@ -72,14 +72,14 @@ void detectCycle(ProjectNode t)
  *  this was moved here because it already implements the `visited` pattern inside the tree,
  *  so, it is an assumption that can be made to make it slightly faster. Might be removed
  *  if it makes code comprehension significantly worse.
- * 
- * Returns: 
+ *
+ * Returns:
  */
 private void getProjectTreeImpl(
     ref ProjectNode[] queue,
     CompilationInfo info,
     string[string] subConfigurations,
-    ref ProjectNode[string] visited, 
+    ref ProjectNode[string] visited,
 )
 {
     if(queue.length == 0) return;
@@ -87,7 +87,7 @@ private void getProjectTreeImpl(
     foreach(dep; node.requirements.dependencies)
     {
         if(dep.isSubConfigurationOnly)
-            continue;            
+            continue;
         ProjectNode* visitedDep = dep.fullName in visited;
         ProjectNode depNode;
         if(dep.subConfiguration.isDefault && dep.name in subConfigurations)
@@ -110,7 +110,7 @@ private void getProjectTreeImpl(
                 {
                     //Print merging different subConfigs?
                     visitedDep.requirements = mergeDifferentSubConfigurations(
-                        visitedDep.requirements, 
+                        visitedDep.requirements,
                         depConfig
                     );
                 }

@@ -31,7 +31,7 @@ private string getLatestVersion()
 {
     import std.net.curl;
     import hipjson;
-    
+
     char[] tagsContent = get(GithubTagAPI);
     if(tagsContent.length == 0)
         return null;

@@ -75,7 +75,7 @@ string getLibraryPath(string libName, string outputDir, OS os)
 
         return buildNormalizedPath(dir, getOutputName(TargetType.staticLibrary, name, os));
     }
-    
+
 }
 
 string getConfigurationOutputName(const BuildConfiguration conf, OS os)
@@ -187,12 +187,12 @@ void copyDir(string fromDir, string toDir, bool shallow = true)
         hardLinkFile(e.name, buildNormalizedPath(toDir, baseName(e.name)), true);
 }
 
-/** 
- * 
+/**
+ *
  * Params:
  *   t = The target type
  *   name = Base library name or path
- *   os = Which OS is this running on   
+ *   os = Which OS is this running on
  * Returns: For a given library path (e.g: /some/path/a), will make it /some/path/a.[lib|dll] on Windows and /some/path/liba.[a|so] on POSIX
  */
 string getOutputName(TargetType t, string name, OS os, ISA isa = std.system.instructionSetArchitecture)
@@ -248,8 +248,8 @@ bool isFileHidden(DirEntry e)
 void putSourceFiles(
     ref string[] output,
     const string workingDir,
-    const string[] paths, 
-    const string[] files, 
+    const string[] paths,
+    const string[] files,
     const string[] excludeFiles,
     scope const string[] extensions...
 )
@@ -259,7 +259,7 @@ void putSourceFiles(
     import std.string:endsWith;
     import std.algorithm.searching;
     import std.exception;
-    
+
 
 
 
@@ -275,7 +275,7 @@ void putSourceFiles(
                     continue DirEntryLoop;
             if(isFileHidden(e) || e.isDir)
                 continue;
-            foreach(ext; extensions) 
+            foreach(ext; extensions)
             {
                 if(e.name.endsWith(ext))
                 {
@@ -350,7 +350,7 @@ BuildConfiguration getConfigurationFromLibsWithPkgConfig(string[] libs, out stri
             catch(ProcessException e)
                 existsPkgConfig = false;
         }
-        if(pkgConfigFlags.length)        
+        if(pkgConfigFlags.length)
         {
             modifiedFlagsFromPkgConfig~= l;
             foreach (string f; splitter(pkgConfigFlags))
@@ -418,8 +418,8 @@ void createOutputDirFolder(immutable BuildConfiguration cfg)
         mkdirRecurse(cfg.outputDirectory);
 }
 
-/** 
- * This function is a lot more efficient than map!.array, since it won't need to 
+/**
+ * This function is a lot more efficient than map!.array, since it won't need to
  * allocate intermediary memory and won't use range interface
  * Params:
  *   appendTarget = The target in which will have the mapInput appended
@@ -437,7 +437,7 @@ ref string[] mapAppend(Q, T)(return ref string[] appendTarget, const scope Q[] m
         appendTarget[length++] = mapFn(mapInput[i]);
     return appendTarget;
 }
-/** 
+/**
  * This function is a is a less generic mapAppend. It constructs the array with more efficiency
  * Params:
  *   appendTarget = The target in which will have the mapInput appended

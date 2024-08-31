@@ -77,7 +77,7 @@ CompilationResult execCompilation(immutable ThreadBuildData data, shared Project
         string outDir = getConfigurationOutputPath(cfg, os);
         if(exists(outDir))
             remove(outDir);
-        
+
         if(executeCommands(cfg.preBuildCommands, "preBuildCommand", res, cfg.workingDir, env).status)
             return res;
 
@@ -130,7 +130,7 @@ CompilationResult execCompilation(immutable ThreadBuildData data, shared Project
                 ret.output~= linkRes.message;
                 res.compilationCommand~= "\n\nLinking: \n\t"~ linkRes.compilationCommand;
             }
-            
+
 
             res.status = ret.status;
             res.message = ret.output;
@@ -296,7 +296,7 @@ bool buildProjectFullyParallelized(ProjectNode root, Compiler compiler, OS os)
     return doLink(root, os, compiler, mainPackHash, &formulaCache) && copyFiles(root);
 }
 
-/** 
+/**
  * When wanting to do a single thread build, this function must be called.
  * This function is also used when the project has no dependency.
  * Params:
@@ -377,7 +377,7 @@ private void buildFailed(const ProjectNode node, CompilationResult res, const Co
     import redub.misc.github_tag_check;
     errorTitle("Build Failure: '", node.name, " ",node.requirements.version_," [", node.requirements.targetConfiguration,"]' \n\t",
         RedubVersionShort, "\n\t", compiler.getCompilerWithVersion, "\n\tFailed with flags: \n\n\t",
-        res.compilationCommand, 
+        res.compilationCommand,
         "\nFailed after ", res.msNeeded,"ms with message\n\t", res.message
     );
     showNewerVersionMessage();
@@ -498,6 +498,6 @@ private bool doLink(ProjectNode root, OS os, Compiler compiler, string mainPackH
         });
         info("Wrote cache in ", result.msecs, "ms");
     }
-        
+
     return true;
 }

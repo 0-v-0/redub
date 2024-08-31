@@ -2,7 +2,7 @@ module redub.package_searching.cache;
 public import redub.package_searching.api;
 
 
-/** 
+/**
  * The packages cache is a package list indexed by their name.
  * This list contains different versions of the package inside it.
  * Those different versions are used to identify the best compatible version among them.
@@ -55,8 +55,8 @@ PackageInfo* findPackage(string packageName, string packageVersion, string requi
 }
 
 
-/** 
- * 
+/**
+ *
  * Params:
  *   packageName = What is the root package name
  *   path = Where the root package is located.

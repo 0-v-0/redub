@@ -5,16 +5,16 @@ import std.process;
 import std.system;
 
 
-/** 
+/**
  * Handles dub defined project configuration based on environment
- * Returns: 
+ * Returns:
  */
 BuildConfiguration parse()
 {
     import std.process;
     import std.string;
     BuildConfiguration ret;
-    static string[] getArgs(string v){return std.string.split(v, " ");}
+    static string[] getArgs(string v){return v.split(' ');}
     static immutable handlers = [
         ///Contents of the "dflags" field as defined by the package recipe
         "DFLAGS": (ref BuildConfiguration cfg, string v){cfg.dFlags = getArgs(v);},
@@ -31,8 +31,8 @@ BuildConfiguration parse()
         ///Contents of the "stringImportPaths" field as defined by the package recipe
         "STRING_IMPORT_PATHS": (ref BuildConfiguration cfg, string v){cfg.stringImportPaths = getArgs(v);},
     ];
-   
-    foreach(string key, fn; handlers)
+
+    foreach(key, fn; handlers)
     {
         if(key in environment)
             fn(ret, environment[key]);
@@ -121,7 +121,7 @@ struct PackageDubVariables
 
 }
 
-/** 
+/**
  * Reflects InitialDubVariables in the environment
  */
 void setupBuildEnvironmentVariables(InitialDubVariables dubVars)
@@ -152,7 +152,7 @@ InitialDubVariables getInitialDubVariablesFromArguments(DubArguments args, DubBu
     return dubVars;
 }
 
-/** 
+/**
  * This, setups on environment the following variables:
  * - DUB_ROOT_PACKAGE
  * - DUB_ROOT_PACKAGE_DIR
@@ -173,7 +173,7 @@ void setupEnvironmentVariablesForRootPackage(immutable BuildRequirements root)
 }
 
 
-/** 
+/**
  * This function traverses the project tree, while generating environment variables for the directory
  * of the package, by using its name and post-fixed with _PACKAGE_DIR
  * e.g:
@@ -189,7 +189,7 @@ void setupEnvironmentVariablesForPackageTree(ProjectNode root)
         environment[mem.name.toUppercase~"_PACKAGE_DIR"] = mem.requirements.cfg.workingDir;
 }
 
-/** 
+/**
  * Gets the following variables for including in the environment in the build step.
  * - DUB_PACKAGE_DIR
  * - DUB_TARGET_TYPE
@@ -210,7 +210,7 @@ PackageDubVariables getEnvironmentVariablesForPackage(const BuildConfiguration c
     );
 }
 
-/** 
+/**
  * Setups environment variables based on BuildConfiguration -
  * - DUB_PACKAGE_DIR
  * - DUB_TARGET_TYPE
@@ -265,7 +265,7 @@ string parseStringWithEnvironment(string str)
         diffLength+= environment[strVar].length;
     }
 	if(variables.length == 0) return str;
-	
+
     ret = new char[](str.length+diffLength);
 	size_t outStart;
 	size_t srcStart;
@@ -282,7 +282,7 @@ string parseStringWithEnvironment(string str)
 		//Remove the $
 		string envVar = str[v.start+1..v.end];
 
-        ///Copy text up to the variable 
+        ///Copy text up to the variable
         string leftText = str[srcStart..v.start];
         appendToRet(leftText);
 
@@ -308,8 +308,8 @@ unittest
     assert(parseStringWithEnvironment("$HOME $$ORIGIN") == "test $ORIGIN");
 }
 
-/** 
- * 
+/**
+ *
  * Params:
  *   cfg = Base build configuration which will have its variables merged with environment
  * Returns: Merged configuration
@@ -335,7 +335,7 @@ BuildConfiguration parseEnvironment(BuildConfiguration cfg)
     return cfg;
 }
 
-///Parse all inside the string array with environment 
+///Parse all inside the string array with environment
 string[] arrParseEnv(const string[] input)
 {
     if(input.length == 0)

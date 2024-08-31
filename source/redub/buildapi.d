@@ -80,7 +80,7 @@ TargetType targetFrom(string s)
         {
             found = true;
             ret = __traits(getMember, TargetType, mem);
-        } 
+        }
     }
     enforce(found, "Could not find targetType with value "~s);
     return ret;
@@ -141,7 +141,7 @@ struct BuildConfiguration
             }
         }
 
-        
+
         BuildConfiguration ret;
         if(initialSource)
         {
@@ -170,13 +170,13 @@ struct BuildConfiguration
 
     BuildConfiguration clone() const{return cast()this;}
 
-    /** 
+    /**
      * This function is mainly used to merge a default configuration + a subConfiguration.
      * It does not execute a parent<-child merging, this step is done at the ProjectNode.
      * So, almost every property should be merged with each other here.
      * Params:
      *   other = The other configuration to merge
-     * Returns: 
+     * Returns:
      */
     BuildConfiguration merge(BuildConfiguration other) const
     {
@@ -260,7 +260,7 @@ struct BuildConfiguration
         ret.dFlags.exclusiveMerge(other.dFlags, filterDflags);
         return ret;
     }
-    
+
     BuildConfiguration mergeVersions(const BuildConfiguration other) const
     {
         BuildConfiguration ret = clone;
@@ -357,7 +357,7 @@ ref string[] exclusiveMerge(StringRange)(return scope ref string[] a, StringRang
     return a;
 }
 
-/** 
+/**
  * Used when dealing with paths. It normalizes them for not getting the same path twice.
  * This function has been optimized for less memory allocation
  */
@@ -389,7 +389,7 @@ ref string[] exclusiveMergePaths(StringRange)(return scope ref string[] a, Strin
         }
         if(!found)
             countToMerge++;
-    } 
+    }
     if(countToMerge > 0)
     {
         size_t putStart = a.length, length = a.length ;
@@ -410,12 +410,12 @@ ref string[] exclusiveMergePaths(StringRange)(return scope ref string[] a, Strin
     return a;
 }
 
-/** 
+/**
  * This may be more useful in the future. Also may increase compilation speed
  */
 enum Visibility
 {
-    public_,  
+    public_,
     private_,
 }
 Visibility VisibilityFrom(string vis)
@@ -514,7 +514,7 @@ struct BuildRequirements
         bool opEquals(const Configuration other) const
         {
             if(isDefault && other.isDefault) return true;
-            return name == other.name;    
+            return name == other.name;
         }
     }
 
@@ -587,7 +587,7 @@ struct BuildRequirements
         return req;
     }
 
-    /** 
+    /**
      * Configurations and dependencies are merged.
      */
     BuildRequirements merge(BuildRequirements other) const
@@ -608,7 +608,7 @@ struct BuildRequirements
         {
             ptrdiff_t index = countUntil!((d) => d.isSameAs(dep))(ret.dependencies);
             if(index == -1) ret.dependencies~= dep;
-            else 
+            else
             {
                 if(dep.subConfiguration != ret.dependencies[index].subConfiguration)
                     enforce(ret.dependencies[index].subConfiguration.isDefault, "Can't merge 2 non default subConfigurations.");
@@ -674,7 +674,7 @@ class ProjectNode
 
     bool isFullyParallelizable()
     {
-        bool parallelizable = 
+        bool parallelizable =
             requirements.cfg.preBuildCommands.length == 0 &&
             requirements.cfg.postBuildCommands.length == 0;
         foreach(dep; dependencies)
@@ -685,7 +685,7 @@ class ProjectNode
         return parallelizable;
     }
 
-    /** 
+    /**
      * This function will iterate recursively, from bottom to top, and it:
      * - Fixes the name if it is using subPackage name type.
      * - Adds Have_ version for the current project name.
@@ -696,7 +696,7 @@ class ProjectNode
      * >-  sourceFiles if they are libraries.
      * - Infer target type if it is on autodetect
      * - Add the dependency as a library if it is a library
-     * - Add the dependency's libraries 
+     * - Add the dependency's libraries
      * - Outputs on extra information the expected artifact
      * - Remove source libraries from projects to build
      *
@@ -723,7 +723,7 @@ class ProjectNode
         }
 
 
-        
+
         static bool hasPrivateRelationship(const ProjectNode parent, const ProjectNode child)
         {
             foreach(dep; parent.requirements.dependencies)
@@ -774,7 +774,7 @@ class ProjectNode
                 if(node.requirements.cfg.targetType == TargetType.none)
                     node.becomeIndependent();
             }
-            
+
         }
 
         static void finishSelfRequirements(ProjectNode node, OS targetOS, ISA isa)
@@ -797,12 +797,12 @@ class ProjectNode
             }
             node.requirements.cfg = node.requirements.cfg.mergeVersions(toMerge);
 
-            
+
             ///Adds the output to the expectedArtifact. Those files will be considered on the cache formula.
             import redub.command_generators.commons;
 
             node.requirements.extra.expectedArtifacts~= buildNormalizedPath(
-                node.requirements.cfg.outputDirectory, 
+                node.requirements.cfg.outputDirectory,
                 getOutputName(node.requirements.cfg.targetType, node.requirements.cfg.name, targetOS, isa)
             );
 
@@ -855,7 +855,7 @@ class ProjectNode
                         target.requirements.cfg = target.requirements.cfg.mergeLibraries(other);
                         target.requirements.cfg = target.requirements.cfg.mergeLibPaths(other);
                     break;
-                case sourceLibrary: 
+                case sourceLibrary:
                     target.requirements.cfg = target.requirements.cfg.mergeLibraries(input.requirements.cfg);
                     target.requirements.cfg = target.requirements.cfg.mergeLibPaths(input.requirements.cfg);
                     target.requirements.cfg = target.requirements.cfg.mergeSourcePaths(input.requirements.cfg);
@@ -891,7 +891,7 @@ class ProjectNode
             }
             ///Finish defining its self requirements so they can be transferred to its parents
             finishSelfRequirements(node, targetOS, isa);
-            ///If this has a private relationship, no merge occurs with parent. 
+            ///If this has a private relationship, no merge occurs with parent.
             for(int i = 0; i < node.parent.length; i++)
             {
                 ProjectNode p = node.parent[i];
@@ -931,7 +931,7 @@ class ProjectNode
         privatesToMerge = null;
     }
 
-    
+
     bool isUpToDate() const { return !shouldRebuild; }
     bool isUpToDate() const shared { return !shouldRebuild; }
 
@@ -956,8 +956,8 @@ class ProjectNode
         shouldRebuild = true;
         foreach(p; parent) p.invalidateCache();
     }
-    
-    /** 
+
+    /**
      * This function basically invalidates the entire tree, forcing a rebuild
      */
     void invalidateCacheOnTree()
@@ -969,7 +969,7 @@ class ProjectNode
         }
     }
 
-    /** 
+    /**
      * Can only be independent if no dependency is found.
      */
     void becomeIndependent()
@@ -991,7 +991,7 @@ class ProjectNode
     ///Collapses the tree in a single list.
     final auto collapse()
     {
-        if(collapsedRef is null) 
+        if(collapsedRef is null)
         {
             collapsedRef = generateCollapsed();
             foreach(node; collapsedRef) node.collapsedRef = collapsedRef;
@@ -1051,7 +1051,7 @@ class ProjectNode
         }
     }
 
-    /** 
+    /**
      * This function will try to build the entire project in a single compilation run
      */
     void combine()
@@ -1086,13 +1086,13 @@ void putLinkerFiles(const ProjectNode tree, out string[] dataContainer)
     import redub.command_generators.commons;
     import std.range;
     import std.path;
-    
+
     if(tree.requirements.cfg.targetType.isStaticLibrary)
         dataContainer~= buildNormalizedPath(
-            tree.requirements.cfg.outputDirectory, 
+            tree.requirements.cfg.outputDirectory,
             getOutputName(
-                tree.requirements.cfg.targetType, 
-                tree.requirements.cfg.name, 
+                tree.requirements.cfg.targetType,
+                tree.requirements.cfg.name,
                 os));
 
     dataContainer = dataContainer.append(tree.requirements.extra.librariesFullPath.map!((string libPath)
@@ -1104,7 +1104,7 @@ void putLinkerFiles(const ProjectNode tree, out string[] dataContainer)
 void putSourceFiles(const ProjectNode tree, out string[] dataContainer)
 {
     import redub.command_generators.commons;
-    redub.command_generators.commons.putSourceFiles(dataContainer, 
+    redub.command_generators.commons.putSourceFiles(dataContainer,
         tree.requirements.cfg.workingDir,
         tree.requirements.cfg.sourcePaths,
         tree.requirements.cfg.sourceFiles,
