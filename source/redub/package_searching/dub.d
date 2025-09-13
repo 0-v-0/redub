@@ -158,16 +158,10 @@ PackageInfo getPackage(string packageName, string repo, string packageVersion, s
     );
 }
 
-
-
-
 string getPackagePath(string packageName, string repo, string packageVersion, string requiredBy)
 {
     return getPackage(packageName, repo, packageVersion, requiredBy).path;
 }
-
-
-
 
 private ReducedPackageInfo getPackageInJSON(JSONValue json, string packageName, string packageVersion)
 {
@@ -212,6 +206,52 @@ private ReducedPackageInfo getPackageInLocalPackages(string packageName, string 
     if(std.file.exists(locPackages))
         localCache = parseJSON(std.file.readText(locPackages));
     return getPackageInLocalPackages(packageName, packageVersion);
+}
+
+/**
+ * Downloads every package present in the dub.selections.json in parallel (prefetch)
+ * Might be way faster specially for job runners
+ * Params:
+ *   dubSelectionsPath = a dub.selections.json path
+ */
+void prefetchPackages(string dubSelectionsPath)
+{
+    import std.file;
+    import std.parallelism;
+    import redub.package_searching.downloader;
+    import redub.misc.path;
+    if(!exists(dubSelectionsPath))
+        return;
+    JSONValue v = parseJSON(readText(dubSelectionsPath));
+
+    string[2][] prefetchedPackages;
+    string[] packagesToLoadMetadata;
+
+    import redub.package_searching.cache;
+
+    foreach(key, value; v["versions"])
+    {
+        if(value.type == JSONType.string_) //Uses semver
+        {
+            if(SemVer(value.str).isInvalid)
+                continue;
+            string pkgName;
+            getSubPackageInfo(key, pkgName);
+
+            string downloadedPackagePath = redub.misc.path.buildNormalizedPath(getDefaultLookupPathForPackages(), pkgName);
+            if(!std.file.exists(downloadedPackagePath))
+            {
+                packagesToLoadMetadata~= pkgName;
+                prefetchedPackages~= [pkgName, value.str];
+            }
+        }
+    }
+    prefetchPackagesMetadata(packagesToLoadMetadata);
+    foreach(pkg; parallel(prefetchedPackages, 1))
+    {
+            // findPackage(pkg[0], pkg[1], null, "redub-prefetcher");
+        findPackage(pkg[0], null, pkg[1], "redub-prefetcher");
+    }
 }
 
 private string getDefaultLookupPathForPackages()

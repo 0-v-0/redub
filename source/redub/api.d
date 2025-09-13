@@ -192,18 +192,109 @@ string[] getChangedBuildFiles(ProjectNode root, CompilingSession s)
     return buildFiles;
 }
 
+int createNewProject(string projectType, string targetDirectory)
+{
+    import redub.misc.username;
+    import std.conv:text;
+    import std.file;
+    import std.path;
+    import core.interpolation;
+    string projectName;
+    string userName;
+    string dependencies;
+    string path;
+    if(targetDirectory is null)
+        path = getcwd;
+    else if(targetDirectory.isAbsolute)
+        path = targetDirectory;
+    else
+        path = buildNormalizedPath(getcwd, targetDirectory);
+    if(!exists(path))
+        mkdirRecurse(path);
+    string targetDub = buildNormalizedPath(path, "dub.json");
+    if(exists(targetDub))
+    {
+        errorTitle("Folder already has a project file: ", "'", targetDub, "' already exists.");
+        return 1;
+    }
+    projectName = baseName(path);
+    userName = getUserName();
+    int returnCode = 0;
+    string gitIgnore = "*.exe\n*.pdb\n*.o\n*.obj\n*.lst\n*.lnk\n.history\n.dub\ndocs.json\n__dummy.html\ndocs/\n/"~projectName;
+    foreach(ext; [".so", ".dylib", ".dll", ".a", ".lib", "-test-*"])
+        gitIgnore~= "\n" ~ projectName ~ ext;
+    
+    string gitIgnorePath = buildNormalizedPath(path, ".gitignore");
+    
+
+    if(!projectType.length)
+    {
+        std.file.mkdirRecurse(buildNormalizedPath(path, "source"));
+        std.file.write(buildNormalizedPath(path, "source", "app.d"), 
+`import std.stdio;
+
+void main()
+{
+    writeln("Edit source/app.d to start your project.");
+}`);
+    }
+    else
+    {
+        import redub.package_searching.dub;
+        import redub.package_searching.api;
+        import std.stdio;
+        PackageInfo pkg = getPackage(projectType~":init-exec", null, null, "user's "~userName~" 'redub init -t' command");
+        ProjectDetails d = resolveDependencies(false, std.system.os, CompilationDetails.init, ProjectToParse(null, pkg.path, pkg.subPackage));
+        dependencies = `
+    "dependencies": {`~ "\n\t\t\t\"" ~ pkg.packageName ~ `": `;
+        if(!pkg.bestVersion.isMatchAll)
+            dependencies~= `"~>`~pkg.bestVersion.toString~`"`;
+        else
+            dependencies~= `{"path": "`~ pkg.path ~ `"}`;
+
+        dependencies~= "\n\t\t},";
+            
+        d = buildProject(d);
+        if(d.error)
+            return d.getReturnCode;
+        chdir(path);
+        returnCode = executeProgram(d.tree, null);
+        if(returnCode)
+            return returnCode;
+    }
+
+    auto jsonTemplate = 
+i`{
+    "authors": [
+        "$(userName)"
+    ],$(dependencies)
+    "description": "A minimal D application.",
+    "license": "proprietary",
+    "name": "$(projectName)"
+}`;
+
+    if(!exists(gitIgnorePath))
+        std.file.write(gitIgnorePath, gitIgnore);
+    std.file.write(targetDub, jsonTemplate.text);
+
+    infos("Success", " created empty project in ", path);
+    if(projectType)
+        info("Created project using ", projectType, ":init-exec");
+    
+    return returnCode;
+}
+
 void createSelectionsFile(ProjectNode tree)
 {
     import redub.misc.path;
     import std.file;
     import std.array:appender;
     import std.string:replace;
+    import std.path;
     char[512] selectionsPathCache;
     char[] temp = selectionsPathCache;
 
     string selectionsPath = normalizePath(temp, tree.requirements.cfg.workingDir, "dub.selections.json") ;
-    if(exists(selectionsPath))
-        return;
     auto dubSelections = appender!string;
     dubSelections~= "{\n\t\"fileVersion\": 1,\n\t\"versions\": {";
 
@@ -211,6 +302,8 @@ void createSelectionsFile(ProjectNode tree)
 
     foreach(ProjectNode node; tree.collapse)
     {
+        if(node is tree)
+            continue;
         if(!isFirst) dubSelections~=",";
         isFirst = false;
         auto req = node.requirements;
@@ -218,7 +311,7 @@ void createSelectionsFile(ProjectNode tree)
         if(req.version_.length != 0)
             dubSelections~= "\""~req.version_~"\"";
         else
-            dubSelections~= " {\"path\": \""~replace(req.cfg.workingDir, "\\", "\\\\")~"\"}";
+            dubSelections~= " {\"path\": \""~replace(relativePath(req.cfg.workingDir, tree.requirements.cfg.workingDir), "\\", "\\\\")~"\"}";
     }
 
     dubSelections~= "\n\t}\n}";
@@ -435,7 +528,6 @@ ProjectDetails resolveDependencies(
         proj.workingDir = std.file.getcwd;
     }
 
-
     BuildRequirements req;
     if(proj.isSingle)
         req = redub.parsers.single.parseProject(
@@ -530,4 +622,17 @@ string getDubWorkspacePath()
         return buildNormalizedPath(redubEnv["LOCALAPPDATA"], "dub");
     else
         return buildNormalizedPath(redubEnv["HOME"], ".dub");
+}
+
+
+int executeProgram(ProjectNode tree, string[] args)
+{
+    import std.path;
+    import std.array:join;
+    import std.process;
+    import redub.command_generators.commons;
+    return wait(spawnShell(
+        escapeShellCommand(getOutputPath(tree.requirements.cfg, os)) ~ " "~ join(args, " ")
+        )
+    );
 }

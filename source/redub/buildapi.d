@@ -8,7 +8,7 @@ import redub.package_searching.api;
 
 
 ///vX.X.X
-enum RedubVersionOnly = "v1.24.11";
+enum RedubVersionOnly = "v1.24.14";
 ///Redub vX.X.X
 enum RedubVersionShort = "Redub "~RedubVersionOnly;
 ///Redub vX.X.X - Description
@@ -945,11 +945,13 @@ class ProjectNode
         static void transferDependenciesAndClearOptional(ProjectNode node, ref string[] removedOptionals)
         {
             ///Enters in the deepest node
+            import std.string:endsWith;
             for(int i = 0; i < node.dependencies.length; i++)
             {
-                if(node.dependencies[i].isOptional)
+                ///init-exec is a special case that redub will filter.
+                if(node.dependencies[i].isOptional || node.dependencies[i].name.endsWith("init-exec"))
                 {
-                    if(hasLogLevel(LogLevel.warn))
+                    if(node.dependencies[i].isOptional && hasLogLevel(LogLevel.warn))
                         removedOptionals~= node.dependencies[i].name;
                     node.dependencies[i].becomeIndependent();
                     i--;
@@ -982,11 +984,13 @@ class ProjectNode
             import std.path;
             import std.string:replace;
             ///Format from Have_project:subpackage to Have_project_subpackage
-            node.requirements.cfg.name = node.requirements.cfg.name.replace(":", "_");
+
+            string have_ver = "Have_"~node.requirements.cfg.name.replace(":", "_").replace("-", "_");
+
             node.requirements.cfg.targetName = node.requirements.cfg.targetName.replace(":", "_");
 
             ///Format from projects such as match-3 into Have_match_3
-            node.requirements.cfg.versions.exclusiveMerge(["Have_"~node.requirements.cfg.name.replace("-", "_")]);
+            node.requirements.cfg.versions.exclusiveMerge([have_ver]);
             if(node.requirements.cfg.targetType == TargetType.autodetect)
                 node.requirements.cfg.targetType = inferTargetType(node);
 
@@ -995,7 +999,7 @@ class ProjectNode
             foreach(dep; node.dependencies)
             {
                 import std.string:replace;
-                toMerge.versions~= "Have_"~dep.name.replace("-", "_");
+                toMerge.versions~= "Have_"~dep.name.replace("-", "_").replace(":","_");
             }
             node.requirements.cfg = node.requirements.cfg.mergeVersions(toMerge);
 
