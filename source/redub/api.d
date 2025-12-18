@@ -792,12 +792,17 @@ ProjectDetails resolveDependencies(
  * Params:
  *   projectWorkingDir = The project working dir to get the recipe
  *   recipe = The actual recipe. May be null for finding in the folder
- * Returns: The found package name. May throw
+ * Returns: The found package name. Returns null when not found
  */
 string getLocalPackageName(string projectWorkingDir, string recipe = null)
 {
     import redub.parsers.automatic;
-    return getPackageName(projectWorkingDir, recipe);
+    try
+    {
+        return getPackageName(projectWorkingDir, recipe);
+    }
+    catch(Exception e){}
+    return null;
 }
 
 /**
