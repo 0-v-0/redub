@@ -68,6 +68,7 @@ int main(string[] args)
             "test": &testMain,
             "init": &initMain,
             "install": &installMain,
+            "configure": &configureMain,
             "use": &useMain,
             // "watch": &watchMain,
             "run": cast(int function(string[]))null
@@ -433,6 +434,34 @@ int useMain(string[] args)
     {
         infos(meta["globalPaths"][meta["defaultCompiler"].str].str, " is now the default compiler");
     }
+    saveRedubMeta(meta);
+    return 0;
+}
+
+int configureMain(string[] args)
+{
+    import redub.cli.dub;
+    import redub.logging;
+    import redub.meta;
+    import redub.misc.path;
+    import std.getopt;
+    setLogLevel(LogLevel.info);
+
+    struct ConfigArgs
+    {
+        @("Sets whether redub checks for update when an error happens")
+        @("update-check")
+        bool updateCheck = true;
+    }
+    ConfigArgs config;
+    GetoptResult res = betterGetopt(args, config);
+    if(res.helpWanted)
+    {
+        defaultGetoptPrinter(RedubVersionShort~" configure usage: redub configure [options]\nOptions:", res.options);
+        return 0;
+    }
+    JSONValue meta = getRedubMeta();
+    meta["updateCheck"] = JSONValue(config.updateCheck);
     saveRedubMeta(meta);
     return 0;
 }

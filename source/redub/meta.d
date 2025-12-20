@@ -82,3 +82,32 @@ string getExistingRedubVersion()
         return null;
     return ver.str;
 }
+
+string getLatestRedubVersion()
+{
+    import redub.misc.github_tag_check;
+    import std.datetime.systime;
+    JSONValue meta = getRedubMeta();
+    JSONValue* latest = "latestVersion" in meta;
+    if(latest)
+    {
+        long time = latest.array[1].get!long;
+        int currHour = Clock.currTime.hour - SysTime(time).hour;
+        if(currHour == 0)
+            return latest.array[0].str;
+    }
+    string v = redub.misc.github_tag_check.getLatestRedubVersion();
+    JSONValue data = JSONValue([JSONValue(v), JSONValue(Clock.currStdTime)]);
+    meta["latestVersion"] = data;
+    saveRedubMeta(meta);
+    return v;
+}
+
+bool shouldShowNewerVersionMessage()
+{
+    JSONValue meta = getRedubMeta();
+    JSONValue* updateCheck = "updateCheck" in meta;
+    if(updateCheck)
+        return updateCheck.get!bool;
+    return true;
+}

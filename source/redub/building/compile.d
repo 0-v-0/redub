@@ -537,10 +537,13 @@ private void buildSucceeded(ProjectNode node, CompilationResult res)
 {
     if(!node.isCopyEnough)
     {
+        import std.string:stripRight;
         string cfg = node.requirements.targetConfiguration ? (" ["~node.requirements.targetConfiguration~"]") : null;
         string ver = node.requirements.version_.length ? (" "~node.requirements.version_) : null;
 
         infos("Built: ", node.name, ver, cfg, " - ", res.msNeeded, "ms");
+        if(res.message.length)
+            info(res.message.stripRight);
         vlog("\n\t", res.compilationCommand, " \n");
     }
 

@@ -7,16 +7,20 @@ private enum CreateIssueURL = "https://github.com/"~RedubUserRepository~"/issues
 
 void showNewerVersionMessage()
 {
+    import redub.meta;
     import redub.buildapi;
     import redub.logging;
-    string ver = getLatestRedubVersion();
+    if(!shouldShowNewerVersionMessage)
+        return;
+    string ver = redub.meta.getLatestRedubVersion();
     if(ver)
     {
         if(ver != RedubVersionOnly)
         {
             warnTitle(
                 "Redub "~ ver~ " available. \n\t",
-                "Maybe try updating it with 'redub update 'or running dub fetch redub@"~ver[1..$]~" if you think this compilation error is a redub bug."
+                "Maybe try updating it with 'redub update 'or running dub fetch redub@"~ver[1..$]~" if you think this compilation error is a redub bug.\n\t"~
+                "You can disable this message by calling redub configure --update-check=false "
             );
             return;
         }
