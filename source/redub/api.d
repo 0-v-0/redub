@@ -580,7 +580,7 @@ bool cleanProject(ProjectDetails d, bool showMessages)
 ArgsDetails resolveArguments(string[] args, bool isDescribeOnly = false)
 {
     import core.stdc.stdlib;
-    import std.algorithm.comparison:either;
+    import redub.misc.either;
     import std.getopt;
     import std.file;
 
@@ -690,7 +690,7 @@ ProjectDetails resolveDependencies(
 {
     import std.datetime.stopwatch;
     import redub.building.cache;
-    import std.algorithm.comparison;
+    import redub.misc.either;
     import redub.command_generators.commons;
     static import redub.parsers.single;
     static import redub.parsers.automatic;

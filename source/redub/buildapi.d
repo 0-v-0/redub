@@ -337,7 +337,7 @@ struct BuildConfiguration
      */
     BuildConfiguration merge()(const auto ref BuildConfiguration other) const
     {
-        import std.algorithm.comparison:either;
+        import redub.misc.either;
         BuildConfiguration ret = clone;
         ret.runtimeWorkingDir = either(other.runtimeWorkingDir, ret.runtimeWorkingDir);
         ret.targetType = either(other.targetType, ret.targetType);

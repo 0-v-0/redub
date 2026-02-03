@@ -141,11 +141,11 @@ string tryGetStr(JSONValue v, string key)
  */
 Compiler getCompiler(string compilerOrPath = "dmd", string cCompilerOrPath = null, string compilerAssumption = null, string arch = null)
 {
-    import std.algorithm.comparison:either;
+    import redub.misc.either;
     import redub.meta;
 
     JSONValue compilersInfo = getRedubMeta();
-    bool isDefault = compilerOrPath == null;
+    bool isDefault = compilerOrPath.length == 0;
     compilerOrPath = either(compilerOrPath, tryGetStr(compilersInfo, "defaultCompiler"), "dmd");
     cCompilerOrPath = either(cCompilerOrPath, tryGetStr(compilersInfo, "defaultCCompiler"), defaultCCompiler);
 

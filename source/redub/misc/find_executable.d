@@ -7,16 +7,20 @@ string findExecutable(string executableName)
     import std.path : isAbsolute, extension, buildPath;
     import std.file;
     import std.algorithm.iteration:splitter;
+
+    if(executableName.length == 0)
+        throw new Exception("Needs an executable name to find.");
     string pathEnv = getEnvVariable("PATH");
 
     version(Windows)
-        static string[] EXTENSIONS = [".exe", ".bat", ".cmd", ".com", ""];
+        static immutable string[] EXTENSIONS = [".exe", ".bat", ".cmd", ".com", ""];
     else
-        static string[] EXTENSIONS = [""];
+        static immutable string[] EXTENSIONS = [""];
+    static immutable string[] emptyExt = [""];
 
-    string[] extensionsTest = EXTENSIONS;
+    const(string)[] extensionsTest = EXTENSIONS;
     if(extension(executableName) != null)
-        extensionsTest = [""];
+        extensionsTest = emptyExt;
 
     static bool isExecutable(string tPath)
     {
@@ -44,7 +48,7 @@ string findExecutable(string executableName)
     foreach(path; splitter(pathEnv, pathSeparator))
     {
         string str = redub.misc.path.normalizePath(bufferSink, path, executableName);
-        foreach(ext; EXTENSIONS)
+        foreach(ext; extensionsTest)
         {
             bufferSink[str.length..str.length+ext.length] = ext;
             string fullPath = cast(string)buffer[0..str.length+ext.length];

@@ -302,7 +302,6 @@ BuildRequirements parse(JSONValue json, ParseConfig cfg, out BuildConfiguration 
         {
             import std.path;
             import std.exception;
-            import std.algorithm.comparison;
             import redub.package_searching.api;
             import redub.package_searching.cache;
             import std.parallelism;
