@@ -59,10 +59,9 @@ int setupMain(string[] args)
     }
     if(vars.length)
     {
-        string pathEnv = getEnvVariable("PATH");
         import std.stdio;
         writeln("Saved Environment Variables: ", vars);
-        saveEnvVariables(vars, pathEnv);
+        saveEnvVariables(vars);
     }
     return 0;
 }

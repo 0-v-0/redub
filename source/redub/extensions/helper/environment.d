@@ -17,11 +17,14 @@ private void saveEnvVariable(string key, string value)
 {
     import std.windows.registry;
     Key HKCU = Registry.currentUser;
-    Key env = HKCU.getKey("Environment");
+    Key env = HKCU.getKey("Environment", REGSAM.KEY_WRITE);
+    import std.stdio;
+    writeln("Writing: ", env.name, " ", key, " -> ", value);
     env.setValue(key, value);
+
 }
 
-void saveEnvVariables(string[2][] keyValues, string pathEnv)
+void saveEnvVariables(string[2][] keyValues)
 {
     import std.algorithm;
     import redub.misc.path;
@@ -32,11 +35,16 @@ void saveEnvVariables(string[2][] keyValues, string pathEnv)
     {
         import std.windows.registry;
         Key HKCU = Registry.currentUser;
-        Key redub = HKCU.createKey("Software\\Redub");
-        redub.setValue("ManagedEnvironment", newPathEntry);
-        foreach(kv; 0..keys.length)
+        Key redubKey = HKCU.createKey("Software\\Redub");
+
+        import std.stdio;
+        redubKey.setValue("ManagedEnvironment", newPathEntry);
+        foreach(kv; keyValues)
             saveEnvVariable(kv[0], kv[1]);
-        saveEnvVariable("PATH", pathEnv~pathSeparator~newPathEntry);
+
+        string pathEnv = HKCU.getKey("Environment").getValue("Path").value_SZ();
+        saveEnvVariable("Path", pathEnv~pathSeparator~newPathEntry);
+        notifySystemEnvUpdate();
     }
     else version(Posix)
     {
@@ -61,6 +69,14 @@ void saveEnvVariables(string[2][] keyValues, string pathEnv)
     else assert(false, "No support to save env variables in this system.");
 }
 
+version(Windows)
+void notifySystemEnvUpdate()
+{
+    import core.sys.windows.winuser;
+    import core.sys.windows.windef;
+    SendMessageTimeoutW(HWND_BROADCAST, WM_SETTINGCHANGE, 0, cast(LPARAM)"Environment"w.ptr, SMTO_ABORTIFHUNG, 5000, null);
+}
+
 void deleteRedubEnvVariables()
 {
     version(Windows)
@@ -71,20 +87,25 @@ void deleteRedubEnvVariables()
         import std.algorithm;
         import redub.parsers.environment;
         Key HKCU = Registry.currentUser;
-        Key redub = HKCU.createKey("Software\\Redub");
+        Key redubKey = HKCU.getKey("Software\\Redub");
         try
         {
-            string appendedEnv = redub.getValue("ManagedEnvironment");
+            Value appendedEnv = redubKey.getValue("ManagedEnvironment");
             string currPath = getEnvVariable("PATH");
-            foreach(inputPath; splitter(appendedEnv, pathSeparator))
+            
+            string[] existingPaths = appendedEnv.value_SZ.split(pathSeparator);
+            string[] currPaths = currPath.split(pathSeparator);
+            string[] result;
+            outer: foreach(p; currPaths)
             {
-                ptrdiff_t start = currPath.countUntil(inputPath);
-                if(start != -1)
-                {
-                    currPath = currPath[0..start] ~ currPath[start+inputPath.length+1..$];
-                }
+                import std.uni;
+                foreach(existing; existingPaths)
+                    if(asLowerCase(p) == asLowerCase(existing))
+                        continue outer;
+                result~= p;
             }
-            saveEnvVariable("PATH", currPath);
+            saveEnvVariable("Path", result.join(pathSeparator));
+            notifySystemEnvUpdate();
         }
         catch(Exception e)
         {
@@ -123,10 +144,8 @@ string getRcFile()
 version(Windows)
 private void deleteEnvVariable(string key)
 {
-    {
-        import std.windows.registry;
-        Key HKCU = Registry.currentUser;
-        Key env = HKCU.getKey("Environment");
-        env.deleteKey(key);
-    }
+    import std.windows.registry;
+    Key HKCU = Registry.currentUser;
+    Key env = HKCU.getKey("Environment", REGSAM.KEY_WRITE);
+    env.deleteKey(key);
 }
