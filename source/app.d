@@ -54,6 +54,7 @@ int main(string[] args)
 
         import redub.extensions.universal;
         import redub.extensions.update;
+        import redub.extensions.setup;
         import redub.extensions.watcher;
 
 
@@ -61,6 +62,7 @@ int main(string[] args)
             "build": &buildMain,
             "build-universal": &buildUniversalMain,
             "update": &updateMain,
+            "setup": &setupMain,
             "clean": &cleanMain,
             "describe": &describeMain,
             "deps": &depsMain,

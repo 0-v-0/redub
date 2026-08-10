@@ -137,13 +137,14 @@ string processIcon(string[] filenames, out string errors)
     rhDir.characteristics = 0;
 
     GRPICONDIRENTRY[] gides;
-    foreach(ushort icoIdx, ico; icos) {
+    foreach(size_t icoIdx, ico; icos) {
+        import std.conv:to;
         GRPICONDIRENTRY gide;
         gide.bWidth = ico.imageWidth;
         gide.bHeight = ico.imageHeight;
         gide.wPlanes = 1;
         gide.dwBytesInRes = cast(int) ico.icoBytes.length;
-        gide.nId = cast(ushort)(2 + icoIdx); // auto-assign some unused id numbers for each piece of icon data
+        gide.nId = (2 + icoIdx).to!ushort; // auto-assign some unused id numbers for each piece of icon data
         gides ~= gide;
     }
 

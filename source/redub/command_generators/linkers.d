@@ -5,14 +5,26 @@ public import std.system;
 import redub.command_generators.commons;
 
 
+///Rough way to check for start-group. Might need a proper linker identification in the future.
+bool canEmitStartGroup(OS os, ISA isa, AcceptedLinker linker)
+{
+    if(isa == ISA.webAssembly || cast(OSExtension)os == OSExtension.emscripten)
+        return false;
+    if(os.isApple)
+        return false;
+    if(isa == ISA.arm) //TODO: Added because PSVita is an ARM target and it is currently the only target without detection
+        return false;
+    return true;
+}
+
+
 string[] parseLinkConfiguration(const ThreadBuildData data, CompilingSession s, string requirementCache)
 {
     import redub.misc.path;
     import redub.building.cache;
     string[] cmds;
     AcceptedLinker linker = s.compiler.linker;
-    bool emitStartGroup = s.isa != ISA.webAssembly && linker != AcceptedLinker.ld64 && cast(OSExtension)s.os != OSExtension.emscripten;
-
+    bool emitStartGroup = canEmitStartGroup(s.os, s.isa, linker);
 
     const BuildConfiguration b = data.cfg;
     CompilerBinary c = b.getCompiler(s.compiler);
